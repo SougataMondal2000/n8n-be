@@ -85,10 +85,7 @@ app.get("/get-node/:id", async (req, res) => {
     const { id } = req.params;
     const objectId = new mongoose.Types.ObjectId(id);
 
-    const node = await collection.findOne(
-      { _id: objectId },
-      { projection: { displayName: 1, iconUrl: 1 } }
-    );
+    const node = await collection.findOne(objectId);
 
     if (!node) {
       return res.status(404).send({ message: "Node not found" });
