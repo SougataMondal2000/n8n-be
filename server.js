@@ -114,3 +114,25 @@ app.get("/api/workflows", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch workflows" });
   }
 });
+
+app.post("/api/workflows/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const response = await axios.post(
+      `https://hireagent.app.n8n.cloud/api/v1/workflows/${id}/activate`,
+      {},
+      {
+        headers: {
+          "X-N8N-API-KEY":
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5NjFkZGM4YS1hMGRmLTRkNWYtYmNiZC03YWJiNWNkZGUzZGQiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzM5MTY5ODIzfQ.YY7IwUVZh9PRp7hhgQy2h93jlVl-77dk_hBYIiitcV0",
+        },
+      }
+    );
+    res.json(response.data);
+  } catch (error) {
+    console.error("API Error:", error.response?.data || error.message);
+    res
+      .status(500)
+      .json({ error: error.response?.data || "Failed to activate workflow" });
+  }
+});
