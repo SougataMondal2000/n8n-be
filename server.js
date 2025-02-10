@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const axios = require("axios");
 
 dotenv.config();
 
@@ -94,5 +95,22 @@ app.get("/get-node/:id", async (req, res) => {
     res.send(node);
   } catch (error) {
     res.status(500).send({ error: error.message });
+  }
+});
+
+app.get("/api/workflows", async (req, res) => {
+  try {
+    const response = await axios.get(
+      "https://hireagent.app.n8n.cloud/api/v1/workflows",
+      {
+        headers: {
+          "X-N8N-API-KEY":
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5NjFkZGM4YS1hMGRmLTRkNWYtYmNiZC03YWJiNWNkZGUzZGQiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzM5MTY5ODIzfQ.YY7IwUVZh9PRp7hhgQy2h93jlVl-77dk_hBYIiitcV0",
+        },
+      }
+    );
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch workflows" });
   }
 });
