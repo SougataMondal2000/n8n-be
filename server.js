@@ -216,11 +216,12 @@ app.post("/api/create-credentials", async (req, res) => {
   try {
     const response = await axios.post(
       `https://hireagent.app.n8n.cloud/api/v1/credentials`,
-      {},
+      req.body,
       {
         headers: {
           "X-N8N-API-KEY":
             "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5NjFkZGM4YS1hMGRmLTRkNWYtYmNiZC03YWJiNWNkZGUzZGQiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzM5MTY5ODIzfQ.YY7IwUVZh9PRp7hhgQy2h93jlVl-77dk_hBYIiitcV0",
+          "Content-Type": "application/json",
         },
       }
     );
@@ -229,6 +230,6 @@ app.post("/api/create-credentials", async (req, res) => {
     console.error("API Error:", error.response?.data || error.message);
     res
       .status(500)
-      .json({ error: error.response?.data || "Failed to activate workflow" });
+      .json({ error: error.response?.data || "Failed to create credential" });
   }
 });
