@@ -100,7 +100,6 @@ app.get("/get-credentials-names", async (req, res) => {
       .limit(limitNumber)
       .toArray();
 
-    // Extract only the credential names
     const credentialNames = [
       ...new Set(
         nodes.flatMap(
@@ -110,6 +109,19 @@ app.get("/get-credentials-names", async (req, res) => {
     ];
 
     res.send(credentialNames);
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
+app.get("/get-existing-credentials", async (req, res) => {
+  try {
+    const db = mongoose.connection.db;
+    const collection = db.collection("credentials");
+
+    const credentials = await collection.find().toArray();
+
+    res.send(credentials);
   } catch (error) {
     res.status(500).send({ error: error.message });
   }
@@ -231,5 +243,40 @@ app.post("/api/create-credentials", async (req, res) => {
     res
       .status(500)
       .json({ error: error.response?.data || "Failed to create credential" });
+  }
+});
+
+app.post("/api/create-workflows", async (req, res) => {
+  try {
+    const workflowPayload = {
+      name: req.body.name || "Untitled Workflow",
+      nodes: req.body.nodes.map((node) => ({
+        type: node.type,
+        parameters: node.data || {},
+      })),
+      connections: req.body.edges.map((edge) => ({
+        source: edge.source,
+        target: edge.target,
+      })),
+    };
+
+    const response = await axios.post(
+      `https://hireagent.app.n8n.cloud/api/v1/workflows`,
+      workflowPayload,
+      {
+        headers: {
+          "X-N8N-API-KEY":
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5NjFkZGM4YS1hMGRmLTRkNWYtYmNiZC03YWJiNWNkZGUzZGQiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzM5MTY5ODIzfQ.YY7IwUVZh9PRp7hhgQy2h93jlVl-77dk_hBYIiitcV0",
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    res.status(200).json(response.data);
+  } catch (err) {
+    console.error(
+      "Error creating workflow:",
+      err.response?.data || err.message
+    );
+    res.status(500).json({ error: err.response?.data || err.message });
   }
 });
